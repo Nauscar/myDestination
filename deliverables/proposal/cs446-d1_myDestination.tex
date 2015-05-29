@@ -1,0 +1,49 @@
+\documentclass{article}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+  \posttitle{%
+    \par\end{center}
+    \begin{center}\large#1\end{center}
+    \vskip0.5em}%
+}
+
+\author{Aaron Kelly-Barker (ackellyb), \\Kevin Nause (knause), \\Daniel Shpit (doshpit), \\Leo Zhoa (y248zhao)}
+\title{myDestination}
+\subtitle{Software Design and Architecture \\Deliverable 1: Project Proposal}
+\begin{document}
+\maketitle
+\pagebreak
+\section{Project Background}
+myDestination is the name for our location based activity finder. The mobile application suggests nearby activities based on your interests, user ratings and activity availability. With a swipe of a finger, local activities can be booked on the fly. As cellular coverage increases across the globe, myDestination utilizes the web to reduce your headaches when travelling. Previously, trips must be meticulously planned to ensure the best travelling experience. This is frustrating as well as time consuming, not to mention often the best parts of a destination aren't the famous tourist attractions, but instead the areas nearby known to only the locals.  With myDestination you get to immerse yourself into a new culture and lifestyle, by minimizing the planning in favour of greater exploration.  Not only does it recommend top tourist destinations, but also local sceneries for you to enjoy the best of both worlds.
+
+Imagine on your vacation in Venice, you arrived at your destination an hour and half earlier than expected. The city is beautiful and with the free time you want to explore surrounding areas. If you didn't have myDestination, you would ask a local for guidance or find an outdated map to guide you around the city. Both of these methods are likely to be time consuming, uncomforting and may even guide you to a location you do not enjoy. Now you can check out nearby destinations and their pictorial reviews before deciding to visit, and even get preference based suggestions. If the destination requires booking, you can get the lowest prices and book directly on the myDestination application. If you are looking for a gondola ride, myDestination will find you the closest gondola with an opening so you can book the ride before you arrive. If you are hungry, myDestination can book the best nearby restaurant, which suits your taste. Be free of the stresses of a vacation and explore the destination just around the corner.
+
+Our group choose this idea because we all love travelling and we all have encountered situations during our travels where myDestination would be the perfect solution. myDestination is useful in mobile form because it can help users on the fly. If the users aren't able to access the application when they need it the most, myDestination loses its purpose.
+
+\section{Functional Properties}
+\subsection{Target Platform}
+The target platform for myDestination will be Android API 19 and greater.  This will support all current Android devices running KitKat and Lollipop.  An earlier API version will be considered if backwards compatibility results in minor or no API conflicts and does not impede future or ongoing development.
+\subsection{Location and Direction}
+The primary component of myDestination will be to determine a user’s physical location and the direction they are facing.  This can be done by using GPS location and cellular networks as well as determining a true North direction relative to the Android device.
+\subsection{Open Data}
+Open data can be fetched via a supported RESTful interface.  Examples of services that can provide relevant data are: Google Places,Wikipedia, Twitter, Facebook, Yelp, TripAdvisor, foursquare, YellowPages etc.
+\subsubsection{Background Service}
+One of the operating modes for myDestination is to run as a background service that notifies users of nearby locations if idle or moving at walking speeds or biking speeds.  An approximate threshold for this requirement would be 30km/h by default and can be set by the user if desired.  Notifications in this mode will be minimal with a priority in favor of user defined data to conserve battery consumption.
+\subsection{Camera Interface}
+Another operating mode for myDestination is with a graphical interface that displays a visual from the camera where the device is facing.  The orientation of the device will determine an approximate viewing angle for places of interest.  Notifications in this mode are more aggressive and in real time.  If accurate location data is available for a nearby location, an overlay can be placed on top of the camera visual.
+\subsection{Visual Overlays}
+Allows the users to browse through nearby activities, book if available and then write a pictorial comment on the destination. Users can retrieve all the information about an activity by double clicking on the destination. Once a destination is opened up, the user can favorite, book an appointment or cancel an appointment and read reviews.
+\subsection{Audio Interface}
+Auditory feedback is an optional requirement that can enabled for users who wish to have nearby locations announced.  This mode can work with both the Background Service as well as the visual Camera Interface.
+\subsection{Local Database}
+A local database is required for recognizing personal locations that may be nearby.  A user may manually import locations that are relevant to them on a daily basis or through Google Services.
+\section{Non-Functional Properties}
+\subsection{Accessibility}
+The audio interface will be able to announce nearby locations for the visibly impaired.  Additionally, users who are walking or operating a bicycle will be able to receive notifications without the need for visual interaction.
+\subsection{Modular System}
+We need to ability to easily add any new APIs as they come in. Facebook + twitter etc are the dominant forces for now, but more may come along later. Providing an easy abstract system to hook into most APIs will allow us to evolve with the times.  This can be achieved by incorporating plug-ins to work with the main application.
+\subsection{Service Query Ranking}
+Aggregating the many different types of services we can choose from can be costly, both in time and data usage. Giving the choice for the user to choose which services are automatically queried (i.e only having yelp and twitter on) will allow users to increase performance over more limited data. This also ties in with accessibility, as rural users on slower data plans can disable data-heavy services.
+\subsection{No User Info Required}
+All the APIs queried require no user information to use. We don’t have to deal with any security issues, such as dealing with passwords. Therefore, we don’t have to worry about beefy security systems. We can keep everything light.
+\end{document}
