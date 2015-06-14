@@ -38,3 +38,5 @@ gradle-app.setting
 # Ignore .idea folder
 .idea/
 
+# Ignore keys
+app/src/main/res/values/keys.xml

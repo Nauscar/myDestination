@@ -26,6 +26,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends CameraActivity {
 
@@ -49,6 +56,7 @@ public class MainActivity extends CameraActivity {
 
         mFragments.add(CameraFragment.newInstance(0));
         mFragments.add(ListFragment.newInstance(1));
+        mFragments.add(GoogleMapFragment.newInstance(2));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
