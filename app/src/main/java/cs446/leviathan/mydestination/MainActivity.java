@@ -56,7 +56,6 @@ public class MainActivity extends CameraActivity {
 
         mFragments.add(CameraFragment.newInstance(0));
         mFragments.add(ListFragment.newInstance(1));
-        mFragments.add(GoogleMapFragment.newInstance(2));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -135,6 +134,17 @@ public class MainActivity extends CameraActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    private void selectItemFromDrawer(int position) {
+        mDrawerLayout.closeDrawer(mDrawerPane);
+        Toast.makeText(getApplicationContext(), "Selection " + position, Toast.LENGTH_SHORT).show();
+    }
+
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -171,17 +181,17 @@ public class MainActivity extends CameraActivity {
         }
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
+    public class NavItem {
+        String mTitle;
+        String mSubtitle;
+        int mIcon;
 
-    private void selectItemFromDrawer(int position) {
-        mDrawerLayout.closeDrawer(mDrawerPane);
-        Toast.makeText(getApplicationContext(), "Selection " + position, Toast.LENGTH_SHORT).show();
+        public NavItem(String title, String subtitle, int icon) {
+            mTitle = title;
+            mSubtitle = subtitle;
+            mIcon = icon;
+        }
     }
-
 
     class DrawerListAdapter extends BaseAdapter {
 
@@ -231,17 +241,4 @@ public class MainActivity extends CameraActivity {
             return view;
         }
     }
-
-    class NavItem {
-        String mTitle;
-        String mSubtitle;
-        int mIcon;
-
-        public NavItem(String title, String subtitle, int icon) {
-            mTitle = title;
-            mSubtitle = subtitle;
-            mIcon = icon;
-        }
-    }
-
 }
