@@ -3,6 +3,7 @@ package cs446.leviathan.mydestination;
         import android.app.AlertDialog;
         import android.content.DialogInterface;
         import android.content.Intent;
+        import android.location.Location;
         import android.support.v4.app.Fragment;
         import android.content.Context;
         import android.hardware.Camera;
@@ -67,10 +68,15 @@ public class CameraFragment extends Fragment {
         Button captureButton = (Button) view.findViewById(R.id.capture);
         captureButton.setOnClickListener(
                 new View.OnClickListener() {
+                    private MyLocation myLocation;
                     @Override
                     public void onClick(View v) {
                         // get an image from the camera
                         mCamera.takePicture(null, null, mPicture);
+                        if(myLocation == null){
+                            myLocation = new MyLocation(getActivity().getApplicationContext());
+                        }
+                        myLocation.getLocation(getActivity().getApplicationContext(), ((MainActivity) getActivity()).locationResult);
                     }
                 }
         );

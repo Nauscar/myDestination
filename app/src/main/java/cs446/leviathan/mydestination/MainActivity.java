@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cs446.leviathan.mydestination.MyLocation.LocationResult;
 
 public class MainActivity extends CameraActivity {
 
@@ -99,7 +101,6 @@ public class MainActivity extends CameraActivity {
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -236,4 +237,16 @@ public class MainActivity extends CameraActivity {
         }
     }
 
+    //Todo: implement connection functionality
+
+    public LocationResult locationResult = new LocationResult(){
+        @Override
+        public void locationCallback(final Location location){
+            //Everytime a location is requested and found, this function is triggered.
+            if(location == null){
+                return;
+            }
+            Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
+        }
+    };
 }
