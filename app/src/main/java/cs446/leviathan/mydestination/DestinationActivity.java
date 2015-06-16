@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.widget.ListView;
@@ -20,7 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 /**
  * Created by nause on 14/06/15.
  */
-public class DestinationActivity extends ActionBarActivity {
+public class DestinationActivity extends AppCompatActivity {
     private static String TAG = DestinationActivity.class.getSimpleName();
 
     ListView mDrawerList;
