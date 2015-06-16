@@ -6,6 +6,7 @@ import java.util.Locale;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +29,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cs446.leviathan.mydestination.MyLocation.LocationResult;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends CameraActivity {
 
@@ -128,6 +136,17 @@ public class MainActivity extends CameraActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    private void selectItemFromDrawer(int position) {
+        mDrawerLayout.closeDrawer(mDrawerPane);
+        Toast.makeText(getApplicationContext(), "Selection " + position, Toast.LENGTH_SHORT).show();
+    }
+
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -164,17 +183,17 @@ public class MainActivity extends CameraActivity {
         }
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
+    public class NavItem {
+        String mTitle;
+        String mSubtitle;
+        int mIcon;
 
-    private void selectItemFromDrawer(int position) {
-        mDrawerLayout.closeDrawer(mDrawerPane);
-        Toast.makeText(getApplicationContext(), "Selection " + position, Toast.LENGTH_SHORT).show();
+        public NavItem(String title, String subtitle, int icon) {
+            mTitle = title;
+            mSubtitle = subtitle;
+            mIcon = icon;
+        }
     }
-
 
     class DrawerListAdapter extends BaseAdapter {
 
@@ -224,7 +243,7 @@ public class MainActivity extends CameraActivity {
             return view;
         }
     }
-
+    
     class NavItem {
         String mTitle;
         String mSubtitle;
