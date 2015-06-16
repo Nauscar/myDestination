@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cs446.leviathan.mydestination.MyLocation.LocationResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -107,7 +109,6 @@ public class MainActivity extends CameraActivity {
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -242,4 +243,29 @@ public class MainActivity extends CameraActivity {
             return view;
         }
     }
+    
+    class NavItem {
+        String mTitle;
+        String mSubtitle;
+        int mIcon;
+
+        public NavItem(String title, String subtitle, int icon) {
+            mTitle = title;
+            mSubtitle = subtitle;
+            mIcon = icon;
+        }
+    }
+
+    //Todo: implement connection functionality
+
+    public LocationResult locationResult = new LocationResult(){
+        @Override
+        public void locationCallback(final Location location){
+            //Everytime a location is requested and found, this function is triggered.
+            if(location == null){
+                return;
+            }
+            Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
+        }
+    };
 }
