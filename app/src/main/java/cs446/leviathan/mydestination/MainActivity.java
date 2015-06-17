@@ -243,25 +243,13 @@ public class MainActivity extends CameraActivity {
             return view;
         }
     }
-    
-    class NavItem {
-        String mTitle;
-        String mSubtitle;
-        int mIcon;
-
-        public NavItem(String title, String subtitle, int icon) {
-            mTitle = title;
-            mSubtitle = subtitle;
-            mIcon = icon;
-        }
-    }
 
     //Todo: implement connection functionality
 
     public LocationResult locationResult = new LocationResult(){
         @Override
         public void locationCallback(final Location location){
-            //Everytime a location is requested and found, this function is triggered.
+            //Everytime a location is requested and found,get this function is triggered.
             if(location == null){
                 return;
             }

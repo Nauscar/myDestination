@@ -9,11 +9,10 @@
         android:layout_width="match_parent" android:layout_height="match_parent"
         tools:context=".DestinationActivity" />
 
-    <RelativeLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
-
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        <fragment
             android:name="com.google.android.gms.maps.MapFragment"
             android:id="@+id/map"
             android:layout_width="match_parent"
