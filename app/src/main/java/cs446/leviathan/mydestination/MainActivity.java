@@ -1,6 +1,9 @@
 package cs446.leviathan.mydestination;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
@@ -29,6 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cs446.leviathan.mydestination.MyLocation.LocationResult;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -36,6 +43,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.scribe.model.Response;
 
 public class MainActivity extends CameraActivity {
 
@@ -52,10 +61,18 @@ public class MainActivity extends CameraActivity {
     SectionsPagerAdapter mSectionsPagerAdapter;
     ViewPager mViewPager;
 
+    private YelpService yelpService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        String yelpConsumerKey = getResources().getString(R.string.yelp_consumer_key);
+        String yelpConsumerSecret = getResources().getString(R.string.yelp_consumer_secret);
+        String yelpTokenKey = getResources().getString(R.string.yelp_token);
+        String yelpTokenSecret = getResources().getString(R.string.yelp_token_secret);
+        yelpService = new YelpService(yelpConsumerKey, yelpConsumerSecret, yelpTokenKey, yelpTokenSecret);
 
         mFragments.add(CameraFragment.newInstance(0));
         mFragments.add(ListFragment.newInstance(1));
@@ -254,6 +271,27 @@ public class MainActivity extends CameraActivity {
                 return;
             }
             Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
+
+            yelpService.getLocalPlaces(location, apiCallResult);
+        }
+    };
+
+    public YelpService.APICallResult apiCallResult = new YelpService.APICallResult(){
+
+
+        @Override
+        public void APICallback(Response response) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                JsonNode root = mapper.readTree(response.getBody());
+                JsonNode businessJson = root.get("businesses");
+                List<YelpBusinessData> results = mapper.readValue(businessJson.asText(), new TypeReference<YelpBusinessData>() {
+                });
+                for (YelpBusinessData result : results) {
+                    Log.d("hi", result.toString());
+                }
+            } catch (IOException e) {
+            }
         }
     };
 }
