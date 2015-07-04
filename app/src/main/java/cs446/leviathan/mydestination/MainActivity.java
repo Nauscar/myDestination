@@ -2,10 +2,7 @@ package cs446.leviathan.mydestination;
 
 import java.io.IOException;
 import java.util.ArrayList;
-<<<<<<< HEAD
 import java.util.Iterator;
-=======
->>>>>>> Start of YELP API integration. Yelp call is failing due to network call on main activity. Threw it into an async task, but it's still not working
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -332,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
         @Override
         public void APICallback(Response response) {
-
+            
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode businessesNodes = mapper.readValue(response.getBody(), JsonNode.class).get("businesses");
