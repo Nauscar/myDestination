@@ -1,6 +1,9 @@
 package cs446.leviathan.mydestination;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
@@ -34,6 +37,10 @@ import cs446.leviathan.mydestination.MyLocation.LocationResult;
 import cs446.leviathan.mydestination.cardstream.*;
 
 import com.google.android.gms.location.places.PlaceFilter;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -42,7 +49,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
+import org.scribe.model.Response;
 
 
 public class MainActivity extends AppCompatActivity implements CardStream {
@@ -66,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements CardStream {
     SectionsPagerAdapter mSectionsPagerAdapter;
     ViewPager mViewPager;
 
+    private YelpService yelpService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +83,11 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         mFragments.add(GooglePlacesFragment.newInstance(LIST));
         //mFragments.add(GoogleMapFragment.newInstance(MAP));
         //mFragments.add(CameraFragment.newInstance(CAMERA));
+        String yelpConsumerKey = getResources().getString(R.string.yelp_consumer_key);
+        String yelpConsumerSecret = getResources().getString(R.string.yelp_consumer_secret);
+        String yelpTokenKey = getResources().getString(R.string.yelp_token);
+        String yelpTokenSecret = getResources().getString(R.string.yelp_token_secret);
+        yelpService = new YelpService(yelpConsumerKey, yelpConsumerSecret, yelpTokenKey, yelpTokenSecret);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -304,6 +318,27 @@ public class MainActivity extends AppCompatActivity implements CardStream {
             }
 
             Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
+
+            yelpService.getLocalPlaces(location, apiCallResult);
+        }
+    };
+
+    public YelpService.APICallResult apiCallResult = new YelpService.APICallResult(){
+
+
+        @Override
+        public void APICallback(Response response) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                JsonNode root = mapper.readTree(response.getBody());
+                JsonNode businessJson = root.get("businesses");
+                List<YelpBusinessData> results = mapper.readValue(businessJson.asText(), new TypeReference<YelpBusinessData>() {
+                });
+                for (YelpBusinessData result : results) {
+                    Log.d("hi", result.toString());
+                }
+            } catch (IOException e) {
+            }
         }
     };
 }
