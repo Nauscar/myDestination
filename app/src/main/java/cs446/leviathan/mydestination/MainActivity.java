@@ -2,7 +2,10 @@ package cs446.leviathan.mydestination;
 
 import java.io.IOException;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Iterator;
+=======
+>>>>>>> Start of YELP API integration. Yelp call is failing due to network call on main activity. Threw it into an async task, but it's still not working
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -41,9 +44,6 @@ import com.google.android.gms.location.places.PlaceFilter;
 import cs446.leviathan.mydestination.yelp.YelpBusinessData;
 import cs446.leviathan.mydestination.yelp.YelpService;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -53,7 +53,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import org.scribe.model.Response;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MainActivity extends AppCompatActivity implements CardStream {
 
