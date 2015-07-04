@@ -23,6 +23,9 @@ public class MyLocation {
     boolean gps_enabled=false;
     boolean network_enabled=false;
     AsyncTask<Context, Void, Void> mtask;
+    private Context mContext;
+
+    public MyLocation(Context c) { this.mContext = c; }
 
     public boolean getLocation(Context context, LocationResult result)
     {
@@ -69,10 +72,6 @@ public class MyLocation {
         public void onProviderEnabled(String provider) {}
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     };
-
-    private Context mContext;
-    public MyLocation(Context c) { this.mContext = c; }
-
 
     class GetLastLocation extends AsyncTask<Context, Void, Void>
     {
