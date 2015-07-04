@@ -328,17 +328,14 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
         @Override
         public void APICallback(Response response) {
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                JsonNode root = mapper.readTree(response.getBody());
-                JsonNode businessJson = root.get("businesses");
-                List<YelpBusinessData> results = mapper.readValue(businessJson.asText(), new TypeReference<YelpBusinessData>() {
-                });
-                for (YelpBusinessData result : results) {
-                    Log.d("hi", result.toString());
-                }
-            } catch (IOException e) {
-            }
+//            ObjectMapper mapper = new ObjectMapper();
+//            try {
+//                JsonNode root = mapper.readTree(response.getBody());
+//                JsonNode businessJson = root.get("businesses");
+//                List<YelpBusinessData> results = mapper.readValue(businessJson.textValue(), new TypeReference<YelpBusinessData>() {
+//                });
+//            } catch (IOException e) {
+//            }
         }
     };
 }

@@ -48,11 +48,10 @@ public class YelpService {
         }
         this.apiCallResult = result;
         OAuthRequest request = createOAuthRequest("/v2/search");
-        request.addQuerystringParameter("limit", "25");
+        request.addQuerystringParameter("limit", "15");
         request.addQuerystringParameter("sort", "1");
         request.addQuerystringParameter("radius_filter", "5000");
-        request.addQuerystringParameter("latitude", String.valueOf(location.getLatitude()));
-        request.addQuerystringParameter("longitude", String.valueOf(location.getLongitude()));
+        request.addQuerystringParameter("ll", String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude()));
 
         this.service.signRequest(token, request);
 
@@ -77,17 +76,9 @@ public class YelpService {
 
         protected Void doInBackground(Context... params)
         {
-            Handler mHandler = new Handler(Looper.getMainLooper());
-
-            mHandler.post(new Runnable() {
-                public void run() {
-                    Response response = request.send();
-                    Log.d("hi", response.toString());
-                    apiCallResult.APICallback(response);
-                }
-            });
-
-
+            Response response = request.send();
+            Log.d("PLEASEREAD", response.getBody());
+            apiCallResult.APICallback(response);
             return null;
         }
     }
