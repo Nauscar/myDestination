@@ -2,6 +2,7 @@ package cs446.leviathan.mydestination;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -9,6 +10,7 @@ import java.util.Locale;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -46,11 +48,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import cs446.leviathan.mydestination.yelp.YelpBusinessData;
+import cs446.leviathan.mydestination.yelp.YelpService;
 
-import org.scribe.model.Response;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.scribe.model.Response;
 
 public class MainActivity extends AppCompatActivity implements CardStream {
 
@@ -325,17 +330,18 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     public YelpService.APICallResult apiCallResult = new YelpService.APICallResult(){
 
-
         @Override
         public void APICallback(Response response) {
-//            ObjectMapper mapper = new ObjectMapper();
-//            try {
-//                JsonNode root = mapper.readTree(response.getBody());
-//                JsonNode businessJson = root.get("businesses");
-//                List<YelpBusinessData> results = mapper.readValue(businessJson.textValue(), new TypeReference<YelpBusinessData>() {
-//                });
-//            } catch (IOException e) {
-//            }
+
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode businessesNodes = mapper.readValue(response.getBody(), JsonNode.class).get("businesses");
+                List<YelpBusinessData> results = mapper.readValue(businessesNodes.toString(), mapper.getTypeFactory().constructCollectionType(List.class, YelpBusinessData.class));
+                results.toString();
+            }
+            catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
         }
     };
 }
