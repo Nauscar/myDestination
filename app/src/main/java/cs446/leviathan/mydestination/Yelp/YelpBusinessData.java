@@ -1,36 +1,30 @@
-package cs446.leviathan.mydestination;
+package cs446.leviathan.mydestination.yelp;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by Aaron Kelly-Barker on 2015-07-04.
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class YelpBusinessData {
 
     @JsonProperty("name")
     private String name;
 
     @JsonProperty("rating")
-    private float rating; //0-8, 0 = 1 star, 8 = 5 star
+    private float rating; //1-5
 
     @JsonProperty("distance")
-    private double distance;
+    private double distance; //In meters
 
-    @JsonProperty("url")
+    @JsonProperty("mobile_url")
     private String url;
-
-
-    public YelpBusinessData(String name, short rating, double distance, String url ) {
-        this.name = name;
-        this.rating = rating;
-        this.distance = distance;
-        this.url = url;
-    }
 
     public String getName() {
         return name;
     }
-
 
     public double getDistance() {
         return distance;

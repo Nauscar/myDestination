@@ -2,6 +2,7 @@ package cs446.leviathan.mydestination;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +38,8 @@ import cs446.leviathan.mydestination.MyLocation.LocationResult;
 import cs446.leviathan.mydestination.cardstream.*;
 
 import com.google.android.gms.location.places.PlaceFilter;
+import cs446.leviathan.mydestination.yelp.YelpBusinessData;
+import cs446.leviathan.mydestination.yelp.YelpService;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -325,17 +328,18 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     public YelpService.APICallResult apiCallResult = new YelpService.APICallResult(){
 
-
         @Override
         public void APICallback(Response response) {
-//            ObjectMapper mapper = new ObjectMapper();
-//            try {
-//                JsonNode root = mapper.readTree(response.getBody());
-//                JsonNode businessJson = root.get("businesses");
-//                List<YelpBusinessData> results = mapper.readValue(businessJson.textValue(), new TypeReference<YelpBusinessData>() {
-//                });
-//            } catch (IOException e) {
-//            }
+
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode businessesNodes = mapper.readValue(response.getBody(), JsonNode.class).get("businesses");
+                List<YelpBusinessData> results = mapper.readValue(businessesNodes.toString(), mapper.getTypeFactory().constructCollectionType(List.class, YelpBusinessData.class));
+                results.toString();
+            }
+            catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
         }
     };
 }
