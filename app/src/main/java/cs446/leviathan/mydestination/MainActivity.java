@@ -33,13 +33,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends CameraActivity {
+public class MainActivity extends AppCompatActivity {
 
     private static String TAG = MainActivity.class.getSimpleName();
+    private static final int MAP = 0;
+    private static final int LIST = 1;
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
@@ -57,8 +60,9 @@ public class MainActivity extends CameraActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFragments.add(CameraFragment.newInstance(0));
-        mFragments.add(ListFragment.newInstance(1));
+        //mFragments.add(CameraFragment.newInstance(0));
+        mFragments.add(GoogleMapFragment.newInstance(MAP));
+        mFragments.add(ListFragment.newInstance(LIST));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -253,6 +257,28 @@ public class MainActivity extends CameraActivity {
             if(location == null){
                 return;
             }
+
+            GoogleMap map = ((GoogleMapFragment)mFragments.get(MAP)).getGoogleMap();
+
+            if(map != null) {
+
+
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(location.getLatitude(), location.getLongitude()), 13));
+
+                float bear = 0;
+                if(location.hasBearing())
+                    bear = location.getBearing();
+
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                        .zoom(17)                   // Sets the zoom
+                        .bearing(bear)                // Sets the orientation of the camera to east
+                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+
             Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
         }
     };

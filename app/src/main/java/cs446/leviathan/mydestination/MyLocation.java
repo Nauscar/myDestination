@@ -2,6 +2,8 @@ package cs446.leviathan.mydestination;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,6 +18,7 @@ import android.location.LocationManager;
  */
 public class MyLocation {
     LocationManager lm;
+
     LocationResult locationResult;
     boolean gps_enabled=false;
     boolean network_enabled=false;
@@ -101,19 +104,19 @@ public class MyLocation {
                         net_loc=lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
                     //if there are both values use the latest one
-                    if(gps_loc!=null && net_loc!=null){
-                        if(gps_loc.getTime()>net_loc.getTime())
+                    /*if(gps_loc!=null && net_loc!=null){
+                        if(gps_loc.getTime() > net_loc.getTime())
                             locationResult.locationCallback(gps_loc);
                         else
                             locationResult.locationCallback(net_loc);
                         return;
-                    }
+                    }*/
 
-                    if(gps_loc!=null){
+                    if(gps_loc != null){
                         locationResult.locationCallback(gps_loc);
                         return;
                     }
-                    if(net_loc!=null){
+                    if(net_loc != null){
                         locationResult.locationCallback(net_loc);
                         return;
                     }

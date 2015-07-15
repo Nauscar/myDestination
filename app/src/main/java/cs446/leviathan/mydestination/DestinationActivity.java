@@ -15,7 +15,11 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by nause on 14/06/15.
@@ -38,7 +42,7 @@ public class DestinationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.destination_main);
 
-        mFragments.add(SupportMapFragment.newInstance()); //TODO: create a custom fragment view
+        mFragments.add(GoogleMapFragment.newInstance(0));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
