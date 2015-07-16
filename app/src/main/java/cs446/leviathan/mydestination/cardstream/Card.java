@@ -20,11 +20,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -67,6 +69,7 @@ public class Card {
     private TextView mTitleView = null;
     private TextView mDescView = null;
     private View mActionAreaView = null;
+    private ImageView mImageView = null;
 
     private Animator mOngoingAnimator = null;
 
@@ -119,6 +122,11 @@ public class Card {
             mTitle = title;
             mTitleView.setText(title);
         }
+        return this;
+    }
+
+    public Card setPicture(Bitmap photo){
+        mImageView.setImageBitmap(photo);
         return this;
     }
 
@@ -494,6 +502,8 @@ public class Card {
             } else if (viewTitle != null) {
                 viewTitle.setVisibility(View.GONE);
             }
+
+            mCard.mImageView = (ImageView) cardView.findViewById(R.id.thumbnail);
 
             // Check that the layout contains a TextView with the card_content id
             View viewDesc = cardView.findViewById(R.id.card_content);

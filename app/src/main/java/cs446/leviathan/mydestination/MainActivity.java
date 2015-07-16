@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     private static String TAG = MainActivity.class.getSimpleName();
 
-    private static final int MAP = 0;
-    private static final int LIST = 1;
+    private static final int MAP = 1;
+    private static final int LIST = 0;
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
@@ -72,9 +72,9 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         setContentView(R.layout.activity_main);
 
         Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.fragment_cardstream);
-        //mFragments.add(CameraFragment.newInstance(0));
-        mFragments.add(GoogleMapFragment.newInstance(MAP));
         mFragments.add(GooglePlacesFragment.newInstance(LIST));
+        //mFragments.add(GoogleMapFragment.newInstance(MAP));
+        //mFragments.add(CameraFragment.newInstance(CAMERA));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 

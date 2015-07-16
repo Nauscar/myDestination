@@ -6,6 +6,7 @@ package cs446.leviathan.mydestination;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -59,11 +61,13 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
      * Action to launch the PlacePicker from a card. Identifies the card action.
      */
     private static final int ACTION_PICK_PLACE = 1;
+    private static final int ACTION_TAKE_PICTURE = 2;
 
     /**
      * Request code passed to the PlacePicker intent to identify its result when it returns.
      */
     private static final int REQUEST_PLACE_PICKER = 1;
+    private static final int REQUEST_TAKE_PICTURE = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,6 +118,10 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             }
 
             // END_INCLUDE(intent)
+        }
+        else if (cardActionId == ACTION_TAKE_PICTURE) {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
         }
     }
 
@@ -177,7 +185,12 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 getCardStream().hideCard(CARD_DETAIL);
             }
 
-        } else {
+        }
+        else if(requestCode == REQUEST_TAKE_PICTURE  && resultCode == Activity.RESULT_OK) {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            getCardStream().getCard(CARD_DETAIL).setPicture(photo);
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
         // END_INCLUDE(activity_result)
@@ -200,6 +213,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         c = new Card.Builder(this, CARD_DETAIL)
                 .setTitle(getString(R.string.empty))
                 .setDescription(getString(R.string.empty))
+                .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_NEUTRAL)
                 .build(getActivity());
         getCardStream().addCard(c, false);
 
