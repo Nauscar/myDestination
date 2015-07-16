@@ -24,8 +24,9 @@
         android:layout_height="wrap_content"
         android:text="Camera"
         android:id="@+id/camera_button"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 
 </RelativeLayout>

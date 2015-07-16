@@ -6,6 +6,8 @@ import java.util.Locale;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -29,6 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cs446.leviathan.mydestination.MyLocation.LocationResult;
+import cs446.leviathan.mydestination.cardstream.*;
+
+import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -38,9 +43,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity {
+
+
+public class MainActivity extends AppCompatActivity implements CardStream {
 
     private static String TAG = MainActivity.class.getSimpleName();
+
     private static final int MAP = 0;
     private static final int LIST = 1;
 
@@ -48,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     RelativeLayout mDrawerPane;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
+
+    public CardStreamFragment mCardStreamFragment;
+    public StreamRetentionFragment mRetentionFragment;
 
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
     ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
@@ -60,9 +71,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.fragment_cardstream);
         //mFragments.add(CameraFragment.newInstance(0));
         mFragments.add(GoogleMapFragment.newInstance(MAP));
-        mFragments.add(ListFragment.newInstance(LIST));
+        mFragments.add(GooglePlacesFragment.newInstance(LIST));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -112,6 +124,21 @@ public class MainActivity extends AppCompatActivity {
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    public CardStreamFragment getCardStream() {
+        if (mCardStreamFragment == null) {
+            //mCardStreamFragment = (CardStreamFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_cardstream);
+            mCardStreamFragment = (CardStreamFragment)mFragments.get(LIST);
+        }
+        return mCardStreamFragment;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        CardStreamState state = getCardStream().dumpState();
+        mRetentionFragment.storeCardStream(state);
     }
 
     @Override
@@ -261,8 +288,6 @@ public class MainActivity extends AppCompatActivity {
             GoogleMap map = ((GoogleMapFragment)mFragments.get(MAP)).getGoogleMap();
 
             if(map != null) {
-
-
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(location.getLatitude(), location.getLongitude()), 13));
 
