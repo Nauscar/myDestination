@@ -69,6 +69,9 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     private static final int REQUEST_PLACE_PICKER = 1;
     private static final int REQUEST_TAKE_PICTURE = 2;
 
+    private static int cardCount = 0;
+    private static String cardActionTag;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +95,8 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
     @Override
     public void onCardClick(int cardActionId, String cardTag) {
+        cardActionTag = cardTag;
+        showAction(false, cardActionTag);
         if (cardActionId == ACTION_PICK_PLACE) {
             // BEGIN_INCLUDE(intent)
             /* Use the PlacePicker Builder to construct an Intent.
@@ -103,10 +108,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 Intent intent = intentBuilder.build(getActivity());
                 // Start the Intent by requesting a result, identified by a request code.
                 startActivityForResult(intent, REQUEST_PLACE_PICKER);
-
-                // Hide the pick option in the UI to prevent users from starting the picker
-                // multiple times.
-                showPickAction(false);
 
             } catch (GooglePlayServicesRepairableException e) {
                 GooglePlayServicesUtil
@@ -120,7 +121,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             // END_INCLUDE(intent)
         }
         else if (cardActionId == ACTION_TAKE_PICTURE) {
-            showCameraAction(false);
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
         }
@@ -144,12 +144,8 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // BEGIN_INCLUDE(activity_result)
-        showCameraAction(true);
         if (requestCode == REQUEST_PLACE_PICKER) {
             // This result is from the PlacePicker dialog.
-
-            // Enable the picker option
-            showPickAction(true);
 
             if (resultCode == Activity.RESULT_OK) {
                 /* User has picked a place, extract data.
@@ -170,32 +166,41 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                     attribution = "";
                 }
 
-                // Update data on card.
-                getCardStream().getCard(CARD_DETAIL)
-                        .setTitle(name.toString())
-                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
-                                attribution));
-
                 // Print data to debug log
                 Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
 
+                // Build the card.
+                StringBuilder cardName = new StringBuilder();
+                cardName.append(CARD_DETAIL);
+                cardName.append(cardCount++);
+                Card c = new Card.Builder(this, cardName.toString())
+                        .setTitle(name.toString())
+                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
+                                attribution))
+                        .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_POSITIVE)
+                        .build(getActivity());
+                getCardStream().addCard(c, false);
+
                 // Show the card.
-                getCardStream().showCard(CARD_DETAIL);
+                getCardStream().showCard(cardName.toString());
+                showAction(true, cardName.toString());
+
 
             } else {
                 // User has not selected a place, hide the card.
-                getCardStream().hideCard(CARD_DETAIL);
+                //getCardStream().hideCard(CARD_DETAIL);
             }
 
         }
         else if(requestCode == REQUEST_TAKE_PICTURE  && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            getCardStream().getCard(CARD_DETAIL).setPicture(photo);
+            getCardStream().getCard(cardActionTag).setPicture(photo);
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
         }
         // END_INCLUDE(activity_result)
+        showAction(true, cardActionTag);
     }
 
     /**
@@ -208,14 +213,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 .setDescription(getString(R.string.pick_text))
                 .addAction(getString(R.string.pick_action), ACTION_PICK_PLACE, Card.ACTION_NEUTRAL)
                 .setLayout(R.layout.card_google)
-                .build(getActivity());
-        getCardStream().addCard(c, false);
-
-        // Add detail card.
-        c = new Card.Builder(this, CARD_DETAIL)
-                .setTitle(getString(R.string.empty))
-                .setDescription(getString(R.string.empty))
-                .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_POSITIVE)
                 .build(getActivity());
         getCardStream().addCard(c, false);
 
@@ -234,13 +231,10 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
      *
      * @param show
      */
-    private void showPickAction(boolean show) {
-        mCards.getCard(CARD_PICKER).setActionVisibility(ACTION_PICK_PLACE, show);
-    }
 
-    private void showCameraAction(boolean show) {
-        mCards.getCard(CARD_DETAIL).setActionVisibility(ACTION_TAKE_PICTURE, show);
-        mCards.getCard(CARD_DETAIL).setActionAreaVisibility(true);
+    private void showAction(boolean show, String cardTag) {
+        mCards.getCard(cardTag).setActionVisibility(ACTION_TAKE_PICTURE, show);
+        mCards.getCard(cardTag).setActionAreaVisibility(true);
     }
     /**
      * Returns the CardStream.
