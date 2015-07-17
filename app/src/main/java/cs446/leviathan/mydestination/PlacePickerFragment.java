@@ -120,6 +120,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             // END_INCLUDE(intent)
         }
         else if (cardActionId == ACTION_TAKE_PICTURE) {
+            showCameraAction(false);
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
         }
@@ -143,6 +144,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // BEGIN_INCLUDE(activity_result)
+        showCameraAction(true);
         if (requestCode == REQUEST_PLACE_PICKER) {
             // This result is from the PlacePicker dialog.
 
@@ -213,7 +215,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         c = new Card.Builder(this, CARD_DETAIL)
                 .setTitle(getString(R.string.empty))
                 .setDescription(getString(R.string.empty))
-                .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_NEUTRAL)
+                .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_POSITIVE)
                 .build(getActivity());
         getCardStream().addCard(c, false);
 
@@ -236,6 +238,10 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         mCards.getCard(CARD_PICKER).setActionVisibility(ACTION_PICK_PLACE, show);
     }
 
+    private void showCameraAction(boolean show) {
+        mCards.getCard(CARD_DETAIL).setActionVisibility(ACTION_TAKE_PICTURE, show);
+        mCards.getCard(CARD_DETAIL).setActionAreaVisibility(true);
+    }
     /**
      * Returns the CardStream.
      *
