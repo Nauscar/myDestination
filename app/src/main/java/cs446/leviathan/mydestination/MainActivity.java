@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.fragment_cardstream);
         mFragments.add(GooglePlacesFragment.newInstance(LIST));
         //mFragments.add(GoogleMapFragment.newInstance(MAP));
         //mFragments.add(CameraFragment.newInstance(CAMERA));

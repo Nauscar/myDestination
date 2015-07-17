@@ -77,9 +77,9 @@ public class GooglePlacesFragment extends CardStreamFragment {
             CardStreamState state = ((MainActivity) getActivity()).mRetentionFragment.getCardStream();
 
             // dump it in CardStreamFragment.
-            ((MainActivity) getActivity()).mCardStreamFragment =
-                    (CardStreamFragment) fm.findFragmentById(R.id.fragment_cardstream);
-            ((MainActivity) getActivity()).mCardStreamFragment.restoreState(state, clickListener);
+            ((MainActivity) getActivity()).mCardStreamFragment = this;
+                    //(CardStreamFragment) fm.findFragmentById(R.id.fragment_cardstream);
+            this.restoreState(state, clickListener);
         }
         return view;
     }
