@@ -62,12 +62,18 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
      */
     private static final int ACTION_PICK_PLACE = 1;
     private static final int ACTION_TAKE_PICTURE = 2;
+    private static final int ACTION_YELP = 3;
+    private static final int ACTION_FACEBOOK = 4;
+    private static final int ACTION_INSTAGRAM = 5;
 
     /**
      * Request code passed to the PlacePicker intent to identify its result when it returns.
      */
     private static final int REQUEST_PLACE_PICKER = 1;
     private static final int REQUEST_TAKE_PICTURE = 2;
+    private static final int REQUEST_YELP = 3;
+    private static final int REQUEST_FACEBOOK = 4;
+    private static final int REQUEST_INSTAGRAM = 5;
 
     private static int cardCount = 0;
     private static String cardActionTag;
@@ -96,7 +102,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     @Override
     public void onCardClick(int cardActionId, String cardTag) {
         cardActionTag = cardTag;
-        showAction(false, cardActionTag);
         if (cardActionId == ACTION_PICK_PLACE) {
             // BEGIN_INCLUDE(intent)
             /* Use the PlacePicker Builder to construct an Intent.
@@ -177,14 +182,21 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                         .setTitle(name.toString())
                         .setDescription(getString(R.string.detail_text, placeId, address, phone,
                                 attribution))
-                        .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_POSITIVE)
+                        .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_NEUTRAL)
+                        .addAction("Review on Yelp", ACTION_YELP, Card.ACTION_POSITIVE)
+                        .addAction("Share on Facebook", ACTION_FACEBOOK, Card.ACTION_POSITIVE)
+                        .addAction("Post on Instagram", ACTION_INSTAGRAM, Card.ACTION_POSITIVE)
                         .build(getActivity());
                 getCardStream().addCard(c, false);
 
                 // Show the card.
                 getCardStream().showCard(cardName.toString());
-                showAction(true, cardName.toString());
+                showAction(true, cardName.toString(), ACTION_TAKE_PICTURE);
+                showAction(true, cardName.toString(), ACTION_YELP);
+                showAction(true, cardName.toString(), ACTION_FACEBOOK);
+                showAction(false, cardName.toString(), ACTION_INSTAGRAM);
 
+                mCards.getCard(cardName.toString()).setActionAreaVisibility(true);
 
             } else {
                 // User has not selected a place, hide the card.
@@ -195,12 +207,13 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         else if(requestCode == REQUEST_TAKE_PICTURE  && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             getCardStream().getCard(cardActionTag).setPicture(photo);
+            showAction(true, cardActionTag, ACTION_INSTAGRAM);
+            showAction(false, cardActionTag, ACTION_TAKE_PICTURE);
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
         }
         // END_INCLUDE(activity_result)
-        showAction(true, cardActionTag);
     }
 
     /**
@@ -232,9 +245,8 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
      * @param show
      */
 
-    private void showAction(boolean show, String cardTag) {
-        mCards.getCard(cardTag).setActionVisibility(ACTION_TAKE_PICTURE, show);
-        mCards.getCard(cardTag).setActionAreaVisibility(true);
+    private void showAction(boolean show, String cardTag, int actionId) {
+        mCards.getCard(cardTag).setActionVisibility(actionId, show);
     }
     /**
      * Returns the CardStream.
