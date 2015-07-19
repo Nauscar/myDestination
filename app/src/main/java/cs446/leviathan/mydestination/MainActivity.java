@@ -10,13 +10,10 @@ import java.util.Locale;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
-<<<<<<< HEAD
 
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
-=======
->>>>>>> 53862341b65725136e414e0c05915706ad336de2
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -39,7 +36,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cs446.leviathan.mydestination.MyLocation.LocationResult;
-<<<<<<< HEAD
 import cs446.leviathan.mydestination.cardstream.*;
 
 import com.google.android.gms.location.places.PlaceFilter;
@@ -52,20 +48,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-=======
->>>>>>> 53862341b65725136e414e0c05915706ad336de2
 import cs446.leviathan.mydestination.yelp.YelpBusinessData;
 import cs446.leviathan.mydestination.yelp.YelpService;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-<<<<<<< HEAD
-=======
-
-import org.scribe.model.Response;
->>>>>>> 53862341b65725136e414e0c05915706ad336de2
-
 import org.scribe.model.Response;
 
 public class MainActivity extends AppCompatActivity implements CardStream {
@@ -96,23 +84,14 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-<<<<<<< HEAD
         mFragments.add(GooglePlacesFragment.newInstance(LIST));
         //mFragments.add(GoogleMapFragment.newInstance(MAP));
         //mFragments.add(CameraFragment.newInstance(CAMERA));
-=======
->>>>>>> 53862341b65725136e414e0c05915706ad336de2
         String yelpConsumerKey = getResources().getString(R.string.yelp_consumer_key);
         String yelpConsumerSecret = getResources().getString(R.string.yelp_consumer_secret);
         String yelpTokenKey = getResources().getString(R.string.yelp_token);
         String yelpTokenSecret = getResources().getString(R.string.yelp_token_secret);
         yelpService = new YelpService(yelpConsumerKey, yelpConsumerSecret, yelpTokenKey, yelpTokenSecret);
-<<<<<<< HEAD
-=======
-
-        mFragments.add(CameraFragment.newInstance(0));
-        mFragments.add(ListFragment.newInstance(1));
->>>>>>> 53862341b65725136e414e0c05915706ad336de2
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
