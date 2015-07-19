@@ -6,8 +6,14 @@ package cs446.leviathan.mydestination;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +33,10 @@ import com.google.android.gms.maps.MapsInitializer;
 
 import cs446.leviathan.mydestination.cardstream.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -126,14 +136,54 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             // END_INCLUDE(intent)
         }
         else if (cardActionId == ACTION_TAKE_PICTURE) {
-            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                // Create the File where the photo should go
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+                // Continue only if the File was successfully created
+                if (photoFile != null) {
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            Uri.fromFile(photoFile));
+                    mCards.getCard(cardActionTag).setPhotoPath(Uri.fromFile(photoFile));
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PICTURE);
+                }
+            }
+            else
+            {
+                Toast.makeText(getActivity(), "Camera is not available.",
+                        Toast.LENGTH_LONG)
+                        .show();
+            }
         }
         else if(cardActionId == ACTION_FACEBOOK){
             //TODO: Share to Facebook
         }
         else if(cardActionId == ACTION_INSTAGRAM){
-            //TODO: Post to Instagram
+            // Create the new Intent using the 'Send' action.
+            Intent share = new Intent(Intent.ACTION_SEND);
+
+            // Set the MIME type
+            share.setType("image/*");
+
+            // Add the URI and the caption to the Intent.
+            share.putExtra(Intent.EXTRA_STREAM, mCards.getCard(cardActionTag).getPhotoPath());
+            share.putExtra(Intent.EXTRA_TEXT, getString(R.string.discovered));
+
+            try {
+                ApplicationInfo info = getActivity().getPackageManager().getApplicationInfo("com.instagram.android", 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                Toast.makeText(getActivity(), "Instagram is not installed.",
+                        Toast.LENGTH_LONG)
+                        .show();
+                return;
+            }
+            share.setPackage("com.instagram.android");
+            startActivity(share);
         }
         else if(cardActionId == ACTION_YELP){
             //TODO: Launch Yelp
@@ -141,6 +191,20 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             //Feel free to create fields in the Card class.
             //Async call goes here.
         }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        return image;
     }
 
     /**
@@ -161,6 +225,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // BEGIN_INCLUDE(activity_result)
+        Card actionCard = mCards.getCard(cardActionTag);
         if (requestCode == REQUEST_PLACE_PICKER) {
             // This result is from the PlacePicker dialog.
 
@@ -217,10 +282,12 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
         }
         else if(requestCode == REQUEST_TAKE_PICTURE  && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            getCardStream().getCard(cardActionTag).setPicture(photo);
-            showAction(true, cardActionTag, ACTION_INSTAGRAM);
-            showAction(false, cardActionTag, ACTION_TAKE_PICTURE);
+
+            Bitmap bitmap = getBitmap(actionCard.getPhotoPath());
+            if(bitmap != null)
+                actionCard.setPicture(bitmap);
+            showAction(true, actionCard.getTag(), ACTION_INSTAGRAM);
+            showAction(false, actionCard.getTag(), ACTION_TAKE_PICTURE);
         }
         else if(requestCode == REQUEST_FACEBOOK){
             //TODO: Share to Facebook
@@ -230,7 +297,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         }
         else if(requestCode == REQUEST_YELP){
             //TODO: Launch Yelp
-            Card card = mCards.getCard(cardActionTag);
             //Feel free to create fields in the Card class.
             //Async callback goes here.
         }
@@ -259,6 +325,26 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 .setDescription(getString(R.string.intro_message))
                 .build(getActivity());
         getCardStream().addCard(c, true);
+
+        for(Card card : mCards.getVisibleCards()){
+            if(card.hasPicture()){
+                Bitmap bitmap = getBitmap(card.getPhotoPath());
+                if(bitmap != null)
+                    card.setPicture(bitmap);
+            }
+        }
+    }
+
+    private Bitmap getBitmap(Uri uri){
+        Bitmap bitmap = null;
+        try{
+            bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+        } catch (Exception e){
+            Toast.makeText(getActivity(), "Image not found.",
+                    Toast.LENGTH_LONG)
+                    .show();
+        }
+        return bitmap;
     }
 
     /**

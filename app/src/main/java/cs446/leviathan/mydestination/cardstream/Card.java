@@ -22,6 +22,8 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import cs446.leviathan.mydestination.R;
 
@@ -70,6 +73,7 @@ public class Card {
     private TextView mDescView = null;
     private View mActionAreaView = null;
     private ImageView mImageView = null;
+    private Uri mPhotoPath = null;
 
     private Animator mOngoingAnimator = null;
 
@@ -126,10 +130,26 @@ public class Card {
     }
 
     public Card setPicture(Bitmap photo){
+        int height = ((View)mImageView.getParent()).getHeight();
+        double ratio = (double)photo.getHeight() / photo.getWidth();
+        int width =  (int)Math.round(height / ratio);
+        photo = photo.createScaledBitmap(photo, width, height, false);
         mImageView.setImageBitmap(photo);
         return this;
     }
 
+    public Card setPhotoPath(Uri photoPath){
+        mPhotoPath = photoPath;
+        return this;
+    }
+
+    public Uri getPhotoPath(){
+        return mPhotoPath;
+    }
+
+    public boolean hasPicture(){
+        return mPhotoPath != null;
+    }
 
     /**
      * Return the UI state, either {@link #CARD_STATE_NORMAL}, {@link #CARD_STATE_FOCUSED}
