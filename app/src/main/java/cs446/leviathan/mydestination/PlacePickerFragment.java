@@ -129,6 +129,18 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
         }
+        else if(cardActionId == ACTION_FACEBOOK){
+            //TODO: Share to Facebook
+        }
+        else if(cardActionId == ACTION_INSTAGRAM){
+            //TODO: Post to Instagram
+        }
+        else if(cardActionId == ACTION_YELP){
+            //TODO: Launch Yelp
+            Card card = mCards.getCard(cardActionTag);
+            //Feel free to create fields in the Card class.
+            //Async call goes here.
+        }
     }
 
     /**
@@ -209,6 +221,18 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             getCardStream().getCard(cardActionTag).setPicture(photo);
             showAction(true, cardActionTag, ACTION_INSTAGRAM);
             showAction(false, cardActionTag, ACTION_TAKE_PICTURE);
+        }
+        else if(requestCode == REQUEST_FACEBOOK){
+            //TODO: Share to Facebook
+        }
+        else if(requestCode == REQUEST_INSTAGRAM){
+            //TODO: Post to Instagram
+        }
+        else if(requestCode == REQUEST_YELP){
+            //TODO: Launch Yelp
+            Card card = mCards.getCard(cardActionTag);
+            //Feel free to create fields in the Card class.
+            //Async callback goes here.
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
