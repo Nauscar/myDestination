@@ -23,6 +23,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -87,10 +90,13 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
     private static int cardCount = 0;
     private static String cardActionTag;
+//    private ShareDialog shareDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+//        shareDialog = new ShareDialog(getActivity());
     }
 
     @Override
@@ -162,6 +168,16 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         }
         else if(cardActionId == ACTION_FACEBOOK){
             //TODO: Share to Facebook
+            Bitmap bitmap = getBitmap(mCards.getCard(cardActionTag).getPhotoPath());
+
+            SharePhoto photo = new SharePhoto.Builder()
+                    .setBitmap(bitmap)
+                    .build();
+            SharePhotoContent content = new SharePhotoContent.Builder()
+                    .addPhoto(photo)
+                    .build();
+
+            ShareDialog.show(getActivity(), content);
         }
         else if(cardActionId == ACTION_INSTAGRAM){
             // Create the new Intent using the 'Send' action.
