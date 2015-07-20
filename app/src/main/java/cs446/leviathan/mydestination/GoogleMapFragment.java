@@ -107,6 +107,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     }
 
     public void updateMap(Card c){
+
         updateMap();
     }
 

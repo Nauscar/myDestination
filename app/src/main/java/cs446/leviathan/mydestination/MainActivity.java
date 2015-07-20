@@ -3,8 +3,11 @@ package cs446.leviathan.mydestination;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
@@ -49,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     private static String TAG = MainActivity.class.getSimpleName();
 
+    private static final int PLACES = 0;
     private static final int MAP = 1;
-    private static final int LIST = 0;
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
@@ -71,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFragments.add(GooglePlacesFragment.newInstance(LIST));
+        mFragments.add(GooglePlacesFragment.newInstance(PLACES));
         mFragments.add(GoogleMapFragment.newInstance(MAP));
         //mFragments.add(CameraFragment.newInstance(CAMERA));
 
@@ -128,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements CardStream {
     public CardStreamFragment getCardStream() {
         if (mCardStreamFragment == null) {
             //mCardStreamFragment = (CardStreamFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_cardstream);
-            mCardStreamFragment = (CardStreamFragment)mFragments.get(LIST);
+            mCardStreamFragment = (CardStreamFragment)mFragments.get(PLACES);
         }
         return mCardStreamFragment;
     }
@@ -178,7 +181,26 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     private void selectItemFromDrawer(int position) {
         mDrawerLayout.closeDrawer(mDrawerPane);
-        Toast.makeText(getApplicationContext(), "Selection " + position, Toast.LENGTH_SHORT).show();
+        switch(position){
+            case 0:
+                //Places
+                mViewPager.setCurrentItem(PLACES);
+                break;
+            case 1:
+                //Maps
+                mViewPager.setCurrentItem(MAP);
+                break;
+            case 2:
+                //About
+                try {
+                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github)));
+                    startActivity(myIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "No Web Browser available.",  Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+                break;
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
