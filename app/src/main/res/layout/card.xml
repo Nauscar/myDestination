@@ -46,7 +46,9 @@
             android:id="@+id/card_title"
             style="@style/CardTitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/thumbnail"/>
 
         <ImageView
             android:layout_width="wrap_content"
@@ -60,7 +62,9 @@
             android:autoLink="web"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/card_title"/>
+            android:layout_below="@id/card_title"
+            android:layout_toLeftOf="@+id/thumbnail"
+            android:layout_alignParentLeft="true"/>
 
     </RelativeLayout>
 
