@@ -1,6 +1,9 @@
 package cs446.leviathan.mydestination;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,22 +13,40 @@ import android.widget.Button;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+
+import cs446.leviathan.mydestination.cardstream.Card;
 
 
 /**
  * Created by nause on 24/05/15.
  */
-public class GoogleMapFragment extends Fragment {
+public class GoogleMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final int CAMERA_REQUEST = 1888;
 
+    private GoogleApiClient mGoogleApiClient = null;
     MapView mMapView;
-    private GoogleMap googleMap;
-    private MyLocation myLocation;
+    private GoogleMap map;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+
+    private ArrayList<Marker> mMarkers = new ArrayList<Marker>();
 
     /**
      * Default empty constructor.
@@ -68,37 +89,50 @@ public class GoogleMapFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        googleMap = mMapView.getMap();
-        googleMap.getUiSettings().setScrollGesturesEnabled(false);
-        googleMap.setMyLocationEnabled(true);
+        map = mMapView.getMap();
+        map.getUiSettings().setScrollGesturesEnabled(false);
+        map.setMyLocationEnabled(true);
 
-        Button photoButton = (Button) view.findViewById(R.id.camera_button);
-        photoButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-            }
-        });
-
-        myLocation = new MyLocation(getActivity().getApplicationContext());
-        myLocation.getLocation(getActivity().getApplicationContext(), ((MainActivity) getActivity()).locationResult);
+        buildGoogleApiClient();
 
         return view;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            ImageView imageView = (ImageView) getView().findViewById(R.id.thumbnail);
-            imageView.setImageBitmap(photo);
-            myLocation.getLocation(getActivity().getApplicationContext(), ((MainActivity) getActivity()).locationResult);
-        }
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    public void updateMap(Card c){
+        updateMap();
+    }
+
+    public void updateMap(){
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation == null || map == null)
+            return;
+
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 13));
+
+        float bear = 0;
+        if(mLastLocation.hasBearing())
+            bear = mLastLocation.getBearing();
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))      // Sets the center of the map to location user
+                .zoom(17)                   // Sets the zoom
+                .bearing(bear)                // Sets the orientation of the camera to east
+                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     public GoogleMap getGoogleMap(){
-        return googleMap;
+        return map;
     }
 
     @Override
@@ -123,5 +157,47 @@ public class GoogleMapFragment extends Fragment {
     public void onLowMemory() {
         super.onLowMemory();
         mMapView.onLowMemory();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(1000); // Update location every second
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        updateMap();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result){
+        Toast.makeText(getActivity(), "Location currently unavailable.",
+                Toast.LENGTH_LONG)
+                .show();
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause){
+        //Move along, nothing to see here.
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Connect the client.
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        // Disconnecting the client invalidates it.
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        updateMap();
     }
 }

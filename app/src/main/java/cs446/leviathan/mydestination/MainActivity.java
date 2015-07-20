@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         setContentView(R.layout.activity_main);
 
         mFragments.add(GooglePlacesFragment.newInstance(LIST));
-        //mFragments.add(GoogleMapFragment.newInstance(MAP));
+        mFragments.add(GoogleMapFragment.newInstance(MAP));
         //mFragments.add(CameraFragment.newInstance(CAMERA));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -131,6 +131,10 @@ public class MainActivity extends AppCompatActivity implements CardStream {
             mCardStreamFragment = (CardStreamFragment)mFragments.get(LIST);
         }
         return mCardStreamFragment;
+    }
+
+    public GoogleMapFragment getMapFragment(){
+        return (GoogleMapFragment)mFragments.get(MAP);
     }
 
     @Override
@@ -273,37 +277,4 @@ public class MainActivity extends AppCompatActivity implements CardStream {
             return view;
         }
     }
-
-    //Todo: implement connection functionality
-
-    public LocationResult locationResult = new LocationResult(){
-        @Override
-        public void locationCallback(final Location location){
-            //Everytime a location is requested and found, this function is triggered.
-            if(location == null){
-                return;
-            }
-
-            GoogleMap map = ((GoogleMapFragment)mFragments.get(MAP)).getGoogleMap();
-
-            if(map != null) {
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
-                float bear = 0;
-                if(location.hasBearing())
-                    bear = location.getBearing();
-
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                        .zoom(17)                   // Sets the zoom
-                        .bearing(bear)                // Sets the orientation of the camera to east
-                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                        .build();                   // Creates a CameraPosition from the builder
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            }
-
-            Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
-        }
-    };
 }
