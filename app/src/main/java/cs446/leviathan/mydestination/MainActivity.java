@@ -3,8 +3,12 @@ package cs446.leviathan.mydestination;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.app.ActionBar;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
@@ -49,8 +53,8 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     private static String TAG = MainActivity.class.getSimpleName();
 
+    private static final int PLACES = 0;
     private static final int MAP = 1;
-    private static final int LIST = 0;
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
@@ -71,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFragments.add(GooglePlacesFragment.newInstance(LIST));
-        //mFragments.add(GoogleMapFragment.newInstance(MAP));
+        mFragments.add(GooglePlacesFragment.newInstance(PLACES));
+        mFragments.add(GoogleMapFragment.newInstance(MAP));
         //mFragments.add(CameraFragment.newInstance(CAMERA));
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -84,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Add items to Navigator
-        mNavItems.add(new NavItem("Home", "My current destination", R.drawable.abc_ic_go_search_api_mtrl_alpha));
-        mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.abc_menu_hardkey_panel_mtrl_mult));
-        mNavItems.add(new NavItem("About", "Get to know about us", R.drawable.abc_textfield_search_material));
+        mNavItems.add(new NavItem("Places", "Nearby places", R.drawable.google_place_icon));
+        mNavItems.add(new NavItem("Maps", "Google maps", R.drawable.google_maps_icon));
+        mNavItems.add(new NavItem("About", "Get to know about us", R.drawable.about_us_icon));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -128,9 +132,13 @@ public class MainActivity extends AppCompatActivity implements CardStream {
     public CardStreamFragment getCardStream() {
         if (mCardStreamFragment == null) {
             //mCardStreamFragment = (CardStreamFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_cardstream);
-            mCardStreamFragment = (CardStreamFragment)mFragments.get(LIST);
+            mCardStreamFragment = (CardStreamFragment)mFragments.get(PLACES);
         }
         return mCardStreamFragment;
+    }
+
+    public GoogleMapFragment getMapFragment(){
+        return (GoogleMapFragment)mFragments.get(MAP);
     }
 
     @Override
@@ -174,7 +182,26 @@ public class MainActivity extends AppCompatActivity implements CardStream {
 
     private void selectItemFromDrawer(int position) {
         mDrawerLayout.closeDrawer(mDrawerPane);
-        Toast.makeText(getApplicationContext(), "Selection " + position, Toast.LENGTH_SHORT).show();
+        switch(position){
+            case 0:
+                //Places
+                mViewPager.setCurrentItem(PLACES);
+                break;
+            case 1:
+                //Maps
+                mViewPager.setCurrentItem(MAP);
+                break;
+            case 2:
+                //About
+                try {
+                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github)));
+                    startActivity(myIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "No Web Browser available.",  Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+                break;
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
@@ -273,37 +300,4 @@ public class MainActivity extends AppCompatActivity implements CardStream {
             return view;
         }
     }
-
-    //Todo: implement connection functionality
-
-    public LocationResult locationResult = new LocationResult(){
-        @Override
-        public void locationCallback(final Location location){
-            //Everytime a location is requested and found, this function is triggered.
-            if(location == null){
-                return;
-            }
-
-            GoogleMap map = ((GoogleMapFragment)mFragments.get(MAP)).getGoogleMap();
-
-            if(map != null) {
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
-                float bear = 0;
-                if(location.hasBearing())
-                    bear = location.getBearing();
-
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                        .zoom(17)                   // Sets the zoom
-                        .bearing(bear)                // Sets the orientation of the camera to east
-                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                        .build();                   // Creates a CameraPosition from the builder
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            }
-
-            Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_SHORT).show();
-        }
-    };
 }

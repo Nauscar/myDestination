@@ -6,7 +6,7 @@
     <string name="pick_text">Select places of interest to construct a list of destinations.</string>
     <string name="pick_action">Pick a place</string>
 
-    <string name="detail_text">Place id: %1$s\nAddress: %2$s\nPhone: %3$s\n\n%4$s</string>
+    <string name="detail_text">Address: %1$s\nPhone: %2$s\nWebsite: %3$s\n\n%4$s</string>
 
     <string name="empty"></string>
 

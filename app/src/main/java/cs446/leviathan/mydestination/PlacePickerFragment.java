@@ -36,16 +36,19 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
+
 
 import cs446.leviathan.mydestination.cardstream.*;
+import cs446.leviathan.mydestination.yelp.YelpBusinessData;
+import cs446.leviathan.mydestination.yelp.YelpService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.transform.Result;
@@ -100,6 +103,8 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
+    private GoogleMapFragment mMapFragment = null;
+    private YelpService yelpService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -122,6 +127,12 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
             }
         });
+
+        String yelpConsumerKey = getResources().getString(R.string.yelp_consumer_key);
+        String yelpConsumerSecret = getResources().getString(R.string.yelp_consumer_secret);
+        String yelpTokenKey = getResources().getString(R.string.yelp_token);
+        String yelpTokenSecret = getResources().getString(R.string.yelp_token_secret);
+        yelpService = new YelpService(yelpConsumerKey, yelpConsumerSecret, yelpTokenKey, yelpTokenSecret);
     }
 
     @Override
@@ -229,8 +240,27 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         else if(cardActionId == ACTION_YELP){
             //TODO: Launch Yelp
             Card card = mCards.getCard(cardActionTag);
+            final Place place = card.getPlace();
+            if (place != null) {
+                YelpBusinessData business = null;
+                //If place has an address associated with it (Probably always will) use that
+                if (place.getAddress() != null || place.getAddress().length() == 0) {
+                    business = yelpService.getBusinessDataWithAddress(place.getAddress(), place.getName());
+                } else {
+                    business = yelpService.getBusinessData(place.getLatLng(), place.getName());
+                }
+
+                //Open yelp url in app
+                if (business != null) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(business.getUrl()));
+                    startActivity(browserIntent);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Unable to find a Yelp page. Sorry!", Toast.LENGTH_LONG).show();
+                }
+            }
             //Feel free to create fields in the Card class.
-            //Async call goes here.
+
         }
     }
 
@@ -284,6 +314,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
                 final String placeId = place.getId();
+                final String url = place.getWebsiteUri() == null ? "No website listed" : place.getWebsiteUri().toString();
                 String attribution = PlacePicker.getAttributions(data);
                 if (attribution == null) {
                     attribution = "";
@@ -298,14 +329,20 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 cardName.append(cardCount++);
                 Card c = new Card.Builder(this, cardName.toString())
                         .setTitle(name.toString())
-                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
+                        .setDescription(getString(R.string.detail_text, address, phone,url.toString(),
                                 attribution))
+                        .setPlace(place)
                         .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_NEUTRAL)
                         .addAction("Review on Yelp", ACTION_YELP, Card.ACTION_POSITIVE)
                         .addAction("Share on Facebook", ACTION_FACEBOOK, Card.ACTION_POSITIVE)
                         .addAction("Post on Instagram", ACTION_INSTAGRAM, Card.ACTION_POSITIVE)
                         .build(getActivity());
                 getCardStream().addCard(c, false);
+
+                if(mMapFragment == null){
+                    mMapFragment = ((MainActivity)getActivity()).getMapFragment();
+                }
+                mMapFragment.addMarker(c);
 
                 // Show the card.
                 getCardStream().showCard(cardName.toString());
@@ -339,14 +376,16 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         }
         else if(requestCode == REQUEST_YELP){
             //TODO: Launch Yelp
+            Card card = mCards.getCard(cardActionTag);
             //Feel free to create fields in the Card class.
-            //Async callback goes here.
+
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
         }
         // END_INCLUDE(activity_result)
     }
+
 
     /**
      * Initializes the picker and detail cards and adds them to the card stream.
@@ -357,7 +396,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 .setTitle(getString(R.string.pick_title))
                 .setDescription(getString(R.string.pick_text))
                 .addAction(getString(R.string.pick_action), ACTION_PICK_PLACE, Card.ACTION_NEUTRAL)
-                .setLayout(R.layout.card_google)
+                //.setLayout(R.layout.card_google)
                 .build(getActivity());
         getCardStream().addCard(c, false);
 
@@ -410,5 +449,12 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             mCards = ((CardStream) getActivity()).getCardStream();
         }
         return mCards;
+    }
+
+    public void removeMarker(String tag) {
+        if(mMapFragment == null){
+            mMapFragment = ((MainActivity)getActivity()).getMapFragment();
+        }
+        mMapFragment.removeMarker(mCards.getCard(tag));
     }
 }

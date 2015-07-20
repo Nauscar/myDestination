@@ -43,7 +43,7 @@ public class CardStreamFragment extends Fragment {
     private HashSet<String> mDismissibleCards = new HashSet<String>(INITIAL_SIZE);
 
     // Set the listener to handle dismissed cards by moving them to the hidden cards map.
-    private CardStreamLinearLayout.OnDissmissListener mCardDismissListener =
+    protected CardStreamLinearLayout.OnDissmissListener mCardDismissListener =
             new CardStreamLinearLayout.OnDissmissListener() {
                 @Override
                 public void onDismiss(String tag) {
@@ -164,7 +164,7 @@ public class CardStreamFragment extends Fragment {
     }
 
 
-    private void dismissCard(String tag) {
+    protected void dismissCard(String tag) {
         final Card card = mVisibleCards.get(tag);
         if (card != null) {
             mDismissibleCards.remove(tag);
