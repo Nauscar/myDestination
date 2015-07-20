@@ -33,6 +33,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.Place;
+
 import cs446.leviathan.mydestination.R;
 
 import java.util.ArrayList;
@@ -74,6 +76,8 @@ public class Card {
     private View mActionAreaView = null;
     private ImageView mImageView = null;
     private Uri mPhotoPath = null;
+
+    private Place mPlace = null;
 
     private Animator mOngoingAnimator = null;
 
@@ -149,6 +153,10 @@ public class Card {
 
     public boolean hasPicture(){
         return mPhotoPath != null;
+    }
+
+    public Place getPlace() {
+        return mPlace;
     }
 
     /**
@@ -433,6 +441,11 @@ public class Card {
 
         public Builder setDescription(String desc) {
             mCard.mDescription = desc;
+            return this;
+        }
+
+        public Builder setPlace(Place place) {
+            mCard.mPlace = place;
             return this;
         }
 
