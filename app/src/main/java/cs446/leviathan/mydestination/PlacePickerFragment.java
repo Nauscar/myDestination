@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -31,13 +33,18 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 
+import org.scribe.model.Response;
+
 import cs446.leviathan.mydestination.cardstream.*;
+import cs446.leviathan.mydestination.yelp.YelpBusinessData;
+import cs446.leviathan.mydestination.yelp.YelpService;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -89,10 +96,18 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     private static String cardActionTag;
 
     private GoogleMapFragment mMapFragment = null;
+    private YelpService yelpService;
+    //Todo: Fix this. Won't work with multiple cards. Needs to grab place from the card
+    private Place lastPlaceSelected = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String yelpConsumerKey = getResources().getString(R.string.yelp_consumer_key);
+        String yelpConsumerSecret = getResources().getString(R.string.yelp_consumer_secret);
+        String yelpTokenKey = getResources().getString(R.string.yelp_token);
+        String yelpTokenSecret = getResources().getString(R.string.yelp_token_secret);
+        yelpService = new YelpService(yelpConsumerKey, yelpConsumerSecret, yelpTokenKey, yelpTokenSecret);
     }
 
     @Override
@@ -190,8 +205,23 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         else if(cardActionId == ACTION_YELP){
             //TODO: Launch Yelp
             Card card = mCards.getCard(cardActionTag);
+            if (lastPlaceSelected != null) {
+                YelpBusinessData business = null;
+                //If place has an address associated with it (Probably always will) use that
+                if (lastPlaceSelected.getAddress() != null || lastPlaceSelected.getAddress().length() == 0) {
+                    business = yelpService.getBusinessDataWithAddress(lastPlaceSelected.getAddress(), lastPlaceSelected.getName());
+                } else {
+                    business = yelpService.getBusinessData(lastPlaceSelected.getLatLng(), lastPlaceSelected.getName());
+                }
+
+                //Open yelp url in app
+                if (business != null) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(business.getUrl()));
+                    startActivity(browserIntent);
+                }
+            }
             //Feel free to create fields in the Card class.
-            //Async call goes here.
+
         }
     }
 
@@ -274,6 +304,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 mMapFragment.updateMap(c);
 
                 // Show the card.
+                lastPlaceSelected = place;
                 getCardStream().showCard(cardName.toString());
                 showAction(true, cardName.toString(), ACTION_TAKE_PICTURE);
                 showAction(true, cardName.toString(), ACTION_YELP);
@@ -304,8 +335,9 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         }
         else if(requestCode == REQUEST_YELP){
             //TODO: Launch Yelp
+            Card card = mCards.getCard(cardActionTag);
             //Feel free to create fields in the Card class.
-            //Async callback goes here.
+
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
