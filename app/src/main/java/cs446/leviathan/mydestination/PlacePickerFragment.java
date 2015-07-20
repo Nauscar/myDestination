@@ -97,8 +97,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
     private GoogleMapFragment mMapFragment = null;
     private YelpService yelpService;
-    //Todo: Fix this. Won't work with multiple cards. Needs to grab place from the card
-    private Place lastPlaceSelected = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
