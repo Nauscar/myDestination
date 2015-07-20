@@ -88,6 +88,8 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
     private static int cardCount = 0;
     private static String cardActionTag;
 
+    private GoogleMapFragment mMapFragment = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -266,6 +268,11 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                         .build(getActivity());
                 getCardStream().addCard(c, false);
 
+                if(mMapFragment == null){
+                    mMapFragment = ((MainActivity)getActivity()).getMapFragment();
+                }
+                mMapFragment.updateMap(c);
+
                 // Show the card.
                 getCardStream().showCard(cardName.toString());
                 showAction(true, cardName.toString(), ACTION_TAKE_PICTURE);
@@ -305,6 +312,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         }
         // END_INCLUDE(activity_result)
     }
+
 
     /**
      * Initializes the picker and detail cards and adds them to the card stream.
