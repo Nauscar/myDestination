@@ -348,7 +348,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 getCardStream().showCard(cardName.toString());
                 showAction(true, cardName.toString(), ACTION_TAKE_PICTURE);
                 showAction(true, cardName.toString(), ACTION_YELP);
-                showAction(true, cardName.toString(), ACTION_FACEBOOK);
+                showAction(false, cardName.toString(), ACTION_FACEBOOK);
                 showAction(false, cardName.toString(), ACTION_INSTAGRAM);
 
                 mCards.getCard(cardName.toString()).setActionAreaVisibility(true);
@@ -365,6 +365,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             if(bitmap != null)
                 actionCard.setPicture(bitmap);
             showAction(true, actionCard.getTag(), ACTION_INSTAGRAM);
+            showAction(true, actionCard.getTag(), ACTION_FACEBOOK);
             showAction(false, actionCard.getTag(), ACTION_TAKE_PICTURE);
         }
         else if(requestCode == REQUEST_FACEBOOK){
