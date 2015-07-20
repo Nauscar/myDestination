@@ -27,6 +27,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -46,6 +47,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     private GoogleMap map;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
+    private float mBearing = 0;
 
     private ArrayList<Marker> mMarkers = new ArrayList<Marker>();
 
@@ -134,17 +136,41 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 13));
 
-        float bear = 0;
         if(mLastLocation.hasBearing())
-            bear = mLastLocation.getBearing();
+            mBearing = mLastLocation.getBearing();
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))      // Sets the center of the map to location user
-                .zoom(17)                   // Sets the zoom
-                .bearing(bear)                // Sets the orientation of the camera to east
-                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        if(mMarkers.size() > 0){
+            CameraPosition previous = map.getCameraPosition();
+            LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+            bounds.include(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            for(Marker tmp : mMarkers){
+                bounds.include(tmp.getPosition());
+            }
+            LatLngBounds latLngBounds = bounds.build();
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 50));
+            float zoom_level = map.getCameraPosition().zoom;
+
+            map.moveCamera(CameraUpdateFactory.newCameraPosition(previous));
+
+            CameraPosition cameraLatLng = new CameraPosition.Builder()
+                    .target(bounds.build().getCenter())
+                    .bearing(mBearing)
+                    .tilt(40)
+                    .zoom(zoom_level)
+                    .build();
+            //Perform the tilt!
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraLatLng));
+        } else {
+            CameraPosition.Builder cameraPositionBuilder = new CameraPosition.Builder()
+                    .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))      // Sets the center of the map to location user
+                    .bearing(mBearing)                // Sets the orientation of the camera to east
+                    .tilt(40)
+                    .zoom(17);
+
+            CameraPosition cameraPosition = cameraPositionBuilder.build();
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+
     }
 
     public GoogleMap getGoogleMap(){
