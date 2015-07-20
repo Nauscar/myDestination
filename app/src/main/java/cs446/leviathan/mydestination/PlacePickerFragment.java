@@ -41,6 +41,7 @@ import cs446.leviathan.mydestination.yelp.YelpService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -277,6 +278,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
                 final String placeId = place.getId();
+                final String url = place.getWebsiteUri() == null ? "No website listed" : place.getWebsiteUri().toString();
                 String attribution = PlacePicker.getAttributions(data);
                 if (attribution == null) {
                     attribution = "";
@@ -291,7 +293,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 cardName.append(cardCount++);
                 Card c = new Card.Builder(this, cardName.toString())
                         .setTitle(name.toString())
-                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
+                        .setDescription(getString(R.string.detail_text, address, phone,url.toString(),
                                 attribution))
                         .setPlace(place)
                         .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_NEUTRAL)
