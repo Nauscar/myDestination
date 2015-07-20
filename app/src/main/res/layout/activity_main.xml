@@ -57,7 +57,7 @@ android:layout_height="match_parent">
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginTop="4dp"
-                android:text="Your destination is just around the corner"
+                android:text="Best travel experience"
                 android:textColor="#fff"
                 android:textSize="12sp" />
         </LinearLayout>

@@ -84,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements CardStream {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Add items to Navigator
-        mNavItems.add(new NavItem("Home", "My current destination", R.drawable.abc_ic_go_search_api_mtrl_alpha));
-        mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.abc_menu_hardkey_panel_mtrl_mult));
-        mNavItems.add(new NavItem("About", "Get to know about us", R.drawable.abc_textfield_search_material));
+        mNavItems.add(new NavItem("Places", "Nearby places", R.drawable.google_place_icon));
+        mNavItems.add(new NavItem("Maps", "Google maps", R.drawable.google_maps_icon));
+        mNavItems.add(new NavItem("About", "Get to know about us", R.drawable.about_us_icon));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
