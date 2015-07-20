@@ -304,7 +304,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 if(mMapFragment == null){
                     mMapFragment = ((MainActivity)getActivity()).getMapFragment();
                 }
-                mMapFragment.updateMap(c);
+                mMapFragment.addMarker(c);
 
                 // Show the card.
                 getCardStream().showCard(cardName.toString());
@@ -357,7 +357,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 .setTitle(getString(R.string.pick_title))
                 .setDescription(getString(R.string.pick_text))
                 .addAction(getString(R.string.pick_action), ACTION_PICK_PLACE, Card.ACTION_NEUTRAL)
-                .setLayout(R.layout.card_google)
+                //.setLayout(R.layout.card_google)
                 .build(getActivity());
         getCardStream().addCard(c, false);
 
@@ -410,5 +410,12 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
             mCards = ((CardStream) getActivity()).getCardStream();
         }
         return mCards;
+    }
+
+    public void removeMarker(String tag) {
+        if(mMapFragment == null){
+            mMapFragment = ((MainActivity)getActivity()).getMapFragment();
+        }
+        mMapFragment.removeMarker(mCards.getCard(tag));
     }
 }

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import cs446.leviathan.mydestination.cardstream.CardStreamFragment;
+import cs446.leviathan.mydestination.cardstream.CardStreamLinearLayout;
 import cs446.leviathan.mydestination.cardstream.CardStreamState;
 import cs446.leviathan.mydestination.cardstream.OnCardClickListener;
 import cs446.leviathan.mydestination.cardstream.StreamRetentionFragment;
@@ -21,10 +22,12 @@ import cs446.leviathan.mydestination.cardstream.StreamRetentionFragment;
 /**
  * Created by nause on 24/05/15.
  */
-public class GooglePlacesFragment extends CardStreamFragment {
+public class GooglePlacesFragment extends CardStreamFragment implements CardStreamLinearLayout.OnDissmissListener{
     private static final String ARG_SECTION_NUMBER = "section_number";
     public static final String FRAGTAG = "PlacePickerFragment";
     private static final String RETENTION_TAG = "retention";
+
+    private PlacePickerFragment mPlacePickerFragment;
 
     /**
      * Default empty constructor.
@@ -47,21 +50,27 @@ public class GooglePlacesFragment extends CardStreamFragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.mCardDismissListener = this;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        PlacePickerFragment fragment = (PlacePickerFragment) fm.findFragmentByTag(FRAGTAG);
+        mPlacePickerFragment = (PlacePickerFragment) fm.findFragmentByTag(FRAGTAG);
 
-        if (fragment == null) {
+        if (mPlacePickerFragment == null) {
             FragmentTransaction transaction = fm.beginTransaction();
-            fragment = new PlacePickerFragment();
-            transaction.add(fragment, FRAGTAG);
+            mPlacePickerFragment = new PlacePickerFragment();
+            transaction.add(mPlacePickerFragment, FRAGTAG);
             transaction.commit();
         }
 
         // Use fragment as click listener for cards, but must implement correct interface
-        if (!(fragment instanceof OnCardClickListener)) {
+        if (!(mPlacePickerFragment instanceof OnCardClickListener)) {
             throw new ClassCastException("PlacePickerFragment must " +
                     "implement OnCardClickListener interface.");
         }
@@ -82,5 +91,11 @@ public class GooglePlacesFragment extends CardStreamFragment {
             this.restoreState(state, clickListener);
         }
         return view;
+    }
+
+    @Override
+    public void onDismiss(String tag) {
+        mPlacePickerFragment.removeMarker(tag);
+        dismissCard(tag);
     }
 }

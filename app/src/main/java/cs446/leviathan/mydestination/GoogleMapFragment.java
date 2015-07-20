@@ -28,6 +28,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
@@ -106,8 +107,22 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 .build();
     }
 
-    public void updateMap(Card c){
+    public void removeMarker(Card c){
+        for(int i = 0; i < mMarkers.size(); ++i){
+            if (mMarkers.get(i).getTitle().equals(c.getTag())) {
+                mMarkers.get(i).remove();
+                mMarkers.remove(i);
+            }
+        }
+    }
 
+    public void addMarker(Card c){
+        Marker tmp = map.addMarker(new MarkerOptions()
+                        .position(c.getPlace().getLatLng())
+                        .draggable(false)
+                        .title(c.getTag())
+        );
+        mMarkers.add(tmp);
         updateMap();
     }
 
