@@ -2,10 +2,14 @@ package cs446.leviathan.mydestination;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
+import android.util.ArrayMap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +29,21 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.w3c.dom.Document;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import cs446.leviathan.mydestination.cardstream.Card;
 
@@ -147,7 +159,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 bounds.include(tmp.getPosition());
             }
             LatLngBounds latLngBounds = bounds.build();
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 50));
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200));
             float zoom_level = map.getCameraPosition().zoom;
 
             map.moveCamera(CameraUpdateFactory.newCameraPosition(previous));
@@ -160,6 +172,38 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     .build();
             //Perform the tilt!
             map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraLatLng));
+
+            /*ArrayList<LatLng> sorted = new ArrayList<LatLng>();
+            LatLng origin = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            for(Marker tmp : mMarkers){
+                for(int i = 0; i < sorted.size(); ++i){
+                    if(distance(origin, sorted.get(i)) > distance(origin, sorted.get(i))){
+                        sorted.add(i, tmp.getPosition());
+                        break;
+                    }
+                    else if(i == sorted.size() - 1){
+                        sorted.add(tmp.getPosition());
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < sorted.size() - 1; ++i) {
+                LatLng fromPosition = sorted.get(i);
+                LatLng toPosition = sorted.get(i+1);
+
+                GMapV2Direction md = new GMapV2Direction();
+
+                Document doc = md.getDocument(fromPosition, toPosition, GMapV2Direction.MODE_WALKING);
+                ArrayList<LatLng> directionPoint = md.getDirection(doc);
+                PolylineOptions rectLine = new PolylineOptions().width(3).color(Color.RED);
+
+                for (int j = 0; j < directionPoint.size(); ++j) {
+                    rectLine.add(directionPoint.get(i));
+                }
+
+                map.addPolyline(rectLine);
+            }*/
         } else {
             CameraPosition.Builder cameraPositionBuilder = new CameraPosition.Builder()
                     .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))      // Sets the center of the map to location user
@@ -170,7 +214,31 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             CameraPosition cameraPosition = cameraPositionBuilder.build();
             map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
+    }
 
+    public double distance(LatLng StartP, LatLng EndP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = StartP.latitude;
+        double lat2 = EndP.latitude;
+        double lon1 = StartP.longitude;
+        double lon2 = EndP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        int kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
+                + " Meter   " + meterInDec);
+
+        return Radius * c;
     }
 
     public GoogleMap getGoogleMap(){
