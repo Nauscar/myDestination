@@ -23,6 +23,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.share.Sharer;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
@@ -42,6 +47,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.transform.Result;
 
 /**
  * Sample demonstrating the use of {@link PlacePicker}.
@@ -90,13 +97,31 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
 
     private static int cardCount = 0;
     private static String cardActionTag;
-//    private ShareDialog shareDialog;
+
+    private CallbackManager callbackManager;
+    private ShareDialog shareDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-//        shareDialog = new ShareDialog(getActivity());
+        FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
+        // this part is optional
+        shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onCancel(){
+
+            }
+            @Override
+            public void onError(FacebookException e){
+
+            }
+            @Override
+            public void onSuccess(Sharer.Result result){
+
+            }
+        });
     }
 
     @Override
@@ -177,7 +202,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                     .addPhoto(photo)
                     .build();
 
-            ShareDialog.show(getActivity(), content);
+            shareDialog.show(this, content);
         }
         else if(cardActionId == ACTION_INSTAGRAM){
             // Create the new Intent using the 'Send' action.
@@ -307,6 +332,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         }
         else if(requestCode == REQUEST_FACEBOOK){
             //TODO: Share to Facebook
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
         else if(requestCode == REQUEST_INSTAGRAM){
             //TODO: Post to Instagram
