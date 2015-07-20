@@ -205,19 +205,23 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
         else if(cardActionId == ACTION_YELP){
             //TODO: Launch Yelp
             Card card = mCards.getCard(cardActionTag);
-            if (lastPlaceSelected != null) {
+            final Place place = card.getPlace();
+            if (place != null) {
                 YelpBusinessData business = null;
                 //If place has an address associated with it (Probably always will) use that
-                if (lastPlaceSelected.getAddress() != null || lastPlaceSelected.getAddress().length() == 0) {
-                    business = yelpService.getBusinessDataWithAddress(lastPlaceSelected.getAddress(), lastPlaceSelected.getName());
+                if (place.getAddress() != null || place.getAddress().length() == 0) {
+                    business = yelpService.getBusinessDataWithAddress(place.getAddress(), place.getName());
                 } else {
-                    business = yelpService.getBusinessData(lastPlaceSelected.getLatLng(), lastPlaceSelected.getName());
+                    business = yelpService.getBusinessData(place.getLatLng(), place.getName());
                 }
 
                 //Open yelp url in app
                 if (business != null) {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(business.getUrl()));
                     startActivity(browserIntent);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Unable to find a Yelp page. Sorry!", Toast.LENGTH_LONG).show();
                 }
             }
             //Feel free to create fields in the Card class.
@@ -291,6 +295,7 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                         .setTitle(name.toString())
                         .setDescription(getString(R.string.detail_text, placeId, address, phone,
                                 attribution))
+                        .setPlace(place)
                         .addAction("Take a picture", ACTION_TAKE_PICTURE, Card.ACTION_NEUTRAL)
                         .addAction("Review on Yelp", ACTION_YELP, Card.ACTION_POSITIVE)
                         .addAction("Share on Facebook", ACTION_FACEBOOK, Card.ACTION_POSITIVE)
@@ -304,7 +309,6 @@ public class PlacePickerFragment extends Fragment implements OnCardClickListener
                 mMapFragment.updateMap(c);
 
                 // Show the card.
-                lastPlaceSelected = place;
                 getCardStream().showCard(cardName.toString());
                 showAction(true, cardName.toString(), ACTION_TAKE_PICTURE);
                 showAction(true, cardName.toString(), ACTION_YELP);
